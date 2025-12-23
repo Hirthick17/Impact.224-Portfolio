@@ -60,19 +60,6 @@ export const Blog: React.FC = () => {
             </ScrollReveal>
         ))}
       </div>
-
-      <div className="mt-20 bg-neutral-900 dark:bg-white rounded-3xl p-8 md:p-12 text-center relative overflow-hidden">
-         <div className="relative z-10">
-            <h2 className="text-3xl font-bold text-white dark:text-neutral-900 mb-4">Subscribe to our newsletter</h2>
-            <p className="text-neutral-400 dark:text-neutral-600 mb-8 max-w-lg mx-auto">Get the latest marketing strategies delivered straight to your inbox. No spam, just value.</p>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-                <input type="email" placeholder="Enter your email" className="flex-grow px-4 py-3 rounded-lg bg-white/10 dark:bg-neutral-200 border border-white/20 dark:border-neutral-300 text-white dark:text-black focus:outline-none focus:ring-2 focus:ring-white dark:focus:ring-black placeholder:text-neutral-500" />
-                <Button className="w-full sm:w-auto">Subscribe</Button>
-            </div>
-         </div>
-         <div className={`absolute top-0 right-0 w-64 h-64 opacity-20 blur-[100px] rounded-full ${getAccentColorClass('bg')}`}></div>
-         <div className={`absolute bottom-0 left-0 w-64 h-64 opacity-20 blur-[100px] rounded-full ${getAccentColorClass('bg')}`}></div>
-      </div>
     </div>
   );
 };

@@ -8,6 +8,7 @@ import { Projects } from './pages/Projects';
 import { About } from './pages/About';
 import { Contact } from './pages/Contact';
 import { Blog } from './pages/Blog';
+import { Pricing } from './pages/Pricing';
 import { ServiceDetail } from './pages/ServiceDetail';
 import { BlogDetail } from './pages/BlogDetail';
 import { ProjectDetail } from './pages/ProjectDetail';
@@ -25,6 +26,7 @@ const App: React.FC = () => {
             <Route path="/projects/:slug" element={<ProjectDetail />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogDetail />} />
+            <Route path="/pricing" element={<Pricing />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
           </Routes>

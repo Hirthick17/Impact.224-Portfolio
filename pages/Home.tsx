@@ -11,44 +11,64 @@ export const Home: React.FC = () => {
   return (
     <>
       {/* --- Hero Section --- */}
-      <section className="relative px-6 py-12 md:py-24 max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center min-h-[85vh]">
-        <ScrollReveal className="space-y-8 z-10">
-          <Badge text="Digital Growth Agency" />
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-neutral-900 dark:text-white">
-            Stop Losing <br/>
-            <span className={`text-transparent bg-clip-text bg-gradient-to-r from-neutral-900 to-neutral-500 dark:from-white dark:to-neutral-400`}>
-              Leads Online.
-            </span>
-          </h1>
-          <p className="text-lg md:text-xl text-neutral-600 dark:text-neutral-400 max-w-lg leading-relaxed">
-            We build high-performance websites and automated marketing systems that turn silent visitors into loyal customers.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 pt-4">
-            <NavLink to="/contact">
-                <Button size="lg" withIcon>Audit My Presence</Button>
-            </NavLink>
-            <NavLink to="/projects">
-                <Button size="lg" variant="ghost">See Results</Button>
-            </NavLink>
-          </div>
-          <div className="pt-8 flex items-center gap-4 text-sm font-medium text-neutral-500">
-             <div className="flex -space-x-2">
-                {[1,2,3,4].map(i => (
-                    <img key={i} src={`https://randomuser.me/api/portraits/men/${i + 20}.jpg`} className="w-10 h-10 rounded-full border-2 border-white dark:border-neutral-950 object-cover" alt="User" />
-                ))}
-             </div>
-             <p>Generating Revenue for 50+ Clients</p>
-          </div>
-        </ScrollReveal>
-        
-        <div className="relative z-0">
-          <div className={`absolute -inset-4 rounded-3xl opacity-20 blur-3xl animate-pulse ${getAccentColorClass('bg')}`}></div>
-          <ScrollReveal delay={200} className="relative rounded-2xl overflow-hidden aspect-square md:aspect-[4/3] shadow-2xl">
-            <img 
-                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1600" 
-                alt="Digital Team Working" 
-                className="w-full h-full object-cover transform transition-transform hover:scale-105 duration-1000"
+      <section className="relative min-h-[85vh] flex flex-col justify-center overflow-hidden bg-black pb-12">
+        {/* Background Image with 30% Opacity */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=2000" 
+            alt="Agency Background" 
+            className="w-full h-full object-cover opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black"></div>
+        </div>
+
+        {/* Gold Sparkle Effect */}
+        <div className="absolute inset-0 z-1 pointer-events-none">
+          {[...Array(15)].map((_, i) => (
+            <div 
+              key={i}
+              className="sparkle-particle animate-sparkle"
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                width: `${Math.random() * 2 + 1}px`,
+                height: `${Math.random() * 2 + 1}px`,
+                opacity: 0.4
+              }}
             />
+          ))}
+        </div>
+
+        {/* Hero Content - Left Aligned */}
+        <div className="relative px-6 py-12 md:py-24 max-w-7xl mx-auto w-full z-10">
+          <ScrollReveal className="space-y-8 max-w-3xl">
+            <Badge text="Digital Growth Agency" />
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-white">
+              Stop Losing <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-neutral-400">
+                Leads Online.
+              </span>
+            </h1>
+            <p className="text-lg md:text-xl text-neutral-400 max-w-2xl leading-relaxed">
+              We build high-performance websites and automated marketing systems that turn silent visitors into loyal customers.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <NavLink to="/contact">
+                  <Button size="lg" withIcon>Audit My Presence</Button>
+              </NavLink>
+              <NavLink to="/projects">
+                  <Button size="lg" variant="ghost">See Results</Button>
+              </NavLink>
+            </div>
+            <div className="pt-8 flex items-center gap-4 text-sm font-medium text-neutral-400">
+               <div className="flex -space-x-2">
+                  {[1,2,3,4].map(i => (
+                      <img key={i} src={`https://randomuser.me/api/portraits/men/${i + 20}.jpg`} className="w-10 h-10 rounded-full border-2 border-neutral-950 object-cover" alt="User" />
+                  ))}
+               </div>
+               <p>Generating Revenue for 50+ Clients</p>
+            </div>
           </ScrollReveal>
         </div>
       </section>
