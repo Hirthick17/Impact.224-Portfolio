@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Connection Test - Impact.224 Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .test-section h2 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 0.5rem;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        .status.pending {
+            background: #fbbf24;
+            color: #000;
+        }
+
+        .status.success {
+            background: #10b981;
+            color: #fff;
+        }
+
+        .status.error {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin: 0.25rem 0;
+            padding: 0.25rem;
+        }
+
+        .log-info {
+            color: #60a5fa;
+        }
+
+        .log-success {
+            color: #34d399;
+        }
+
+        .log-error {
+            color: #f87171;
+        }
+
+        .log-warning {
+            color: #fbbf24;
+        }
+
+        button {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 1rem 0;
+        }
+
+        button:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        button:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .summary {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .summary h2 {
+            margin-bottom: 1rem;
+        }
+
+        .summary .score {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗄️ Database Connection Test</h1>
+        
+        <button id="runTests" onclick="runAllTests()">Run All Tests</button>
+
+        <div class="test-section">
+            <h2>Test 1: Database Connection</h2>
+            <div class="status pending" id="test1-status">Pending</div>
+            <div class="log" id="test1-log"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 2: Read Existing Data</h2>
+            <div class="status pending" id="test2-status">Pending</div>
+            <div class="log" id="test2-log"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 3: Write Test Data</h2>
+            <div class="status pending" id="test3-status">Pending</div>
+            <div class="log" id="test3-log"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 4: Update Test Data</h2>
+            <div class="status pending" id="test4-status">Pending</div>
+            <div class="log" id="test4-log"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 5: Check CMS Pages</h2>
+            <div class="status pending" id="test5-status">Pending</div>
+            <div class="log" id="test5-log"></div>
+        </div>
+
+        <div class="summary" id="summary" style="display: none;">
+            <h2>Test Summary</h2>
+            <div class="score" id="score"></div>
+            <div id="summary-message"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './lib/supabase';
+        import { getCMSContent, saveCMSContent } from './lib/cms-service';
+
+        let testResults = [];
+
+        function addLog(testId, message, type = 'info') {
+            const logDiv = document.getElementById(`${testId}-log`);
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = message;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function setStatus(testId, status) {
+            const statusDiv = document.getElementById(`${testId}-status`);
+            statusDiv.className = `status ${status}`;
+            statusDiv.textContent = status.toUpperCase();
+        }
+
+        async function test1_databaseConnection() {
+            const testId = 'test1';
+            addLog(testId, 'Starting database connection test...', 'info');
+            
+            try {
+                addLog(testId, 'Attempting to connect to Supabase...', 'info');
+                
+                const { data, error } = await supabase
+                    .from('cms_content')
+                    .select('count')
+                    .limit(1);
+                
+                if (error) {
+                    addLog(testId, `Connection failed: ${error.message}`, 'error');
+                    setStatus(testId, 'error');
+                    return false;
+                }
+                
+                addLog(testId, '✓ Successfully connected to Supabase database!', 'success');
+                setStatus(testId, 'success');
+                return true;
+            } catch (err) {
+                addLog(testId, `Exception: ${err.message}`, 'error');
+                setStatus(testId, 'error');
+                return false;
+            }
+        }
+
+        async function test2_readData() {
+            const testId = 'test2';
+            addLog(testId, 'Fetching all page IDs from database...', 'info');
+            
+            try {
+                const { data, error } = await supabase
+                    .from('cms_content')
+                    .select('page_id, updated_at');
+                
+                if (error) {
+                    addLog(testId, `Failed to read data: ${error.message}`, 'error');
+                    setStatus(testId, 'error');
+                    return false;
+                }
+                
+                if (!data || data.length === 0) {
+                    addLog(testId, '⚠ No data found in database (this is okay for new setup)', 'warning');
+                    setStatus(testId, 'success');
+                    return true;
+                }
+                
+                addLog(testId, `✓ Found ${data.length} pages in database:`, 'success');
+                data.forEach(row => {
+                    addLog(testId, `  - ${row.page_id} (updated: ${new Date(row.updated_at).toLocaleString()})`, 'info');
+                });
+                
+                setStatus(testId, 'success');
+                return true;
+            } catch (err) {
+                addLog(testId, `Exception: ${err.message}`, 'error');
+                setStatus(testId, 'error');
+                return false;
+            }
+        }
+
+        async function test3_writeData() {
+            const testId = 'test3';
+            const testPageId = 'test-page-' + Date.now();
+            const testData = {
+                title: 'Test Page',
+                description: 'Test page created by connection tester',
+                timestamp: new Date().toISOString(),
+                testValue: Math.random(),
+            };
+            
+            try {
+                addLog(testId, `Creating test page: ${testPageId}`, 'info');
+                
+                const success = await saveCMSContent(testPageId, testData);
+                
+                if (!success) {
+                    addLog(testId, 'Failed to save test data', 'error');
+                    setStatus(testId, 'error');
+                    return false;
+                }
+                
+                addLog(testId, 'Verifying data was saved correctly...', 'info');
+                
+                const retrieved = await getCMSContent(testPageId);
+                
+                if (!retrieved) {
+                    addLog(testId, 'Failed to retrieve saved data', 'error');
+                    setStatus(testId, 'error');
+                    return false;
+                }
+                
+                if (JSON.stringify(retrieved) !== JSON.stringify(testData)) {
+                    addLog(testId, 'Retrieved data does not match saved data', 'error');
+                    setStatus(testId, 'error');
+                    return false;
+                }
+                
+                addLog(testId, '✓ Successfully wrote and verified test data!', 'success');
+                
+                // Clean up
+                addLog(testId, 'Cleaning up test data...', 'info');
+                await supabase.from('cms_content').delete().eq('page_id', testPageId);
+                addLog(testId, '✓ Test data cleaned up', 'success');
+                
+                setStatus(testId, 'success');
+                return true;
+            } catch (err) {
+                addLog(testId, `Exception: ${err.message}`, 'error');
+                setStatus(testId, 'error');
+                return false;
+            }
+        }
+
+        async function test4_updateData() {
+            const testId = 'test4';
+            const testPageId = 'test-update-' + Date.now();
+            const initialData = { version: 1, content: 'Initial content' };
+            const updatedData = { version: 2, content: 'Updated content', updatedAt: new Date().toISOString() };
+            
+            try {
+                addLog(testId, 'Creating initial data...', 'info');
+                await saveCMSContent(testPageId, initialData);
+                
+                addLog(testId, 'Updating data...', 'info');
+                await saveCMSContent(testPageId, updatedData);
+                
+                addLog(testId, 'Verifying update...', 'info');
+                const retrieved = await getCMSContent(testPageId);
+                
+                if (!retrieved) {
+                    addLog(testId, 'Failed to retrieve updated data', 'error');
+                    setStatus(testId, 'error');
+                    return false;
+                }
+                
+                if (JSON.stringify(retrieved) !== JSON.stringify(updatedData)) {
+                    addLog(testId, 'Updated data does not match expected data', 'error');
+                    setStatus(testId, 'error');
+                    return false;
+                }
+                
+                addLog(testId, '✓ Successfully updated and verified data!', 'success');
+                
+                // Clean up
+                await supabase.from('cms_content').delete().eq('page_id', testPageId);
+                
+                setStatus(testId, 'success');
+                return true;
+            } catch (err) {
+                addLog(testId, `Exception: ${err.message}`, 'error');
+                setStatus(testId, 'error');
+                return false;
+            }
+        }
+
+        async function test5_checkCMSPages() {
+            const testId = 'test5';
+            const cmsPages = ['pricing', 'service-web-dev', 'service-marketing', 'service-video', 'home'];
+            
+            try {
+                addLog(testId, 'Checking actual CMS pages...', 'info');
+                
+                for (const pageId of cmsPages) {
+                    const content = await getCMSContent(pageId);
+                    
+                    if (content) {
+                        addLog(testId, `✓ ${pageId}: Data exists`, 'success');
+                        const keys = Object.keys(content);
+                        addLog(testId, `  Keys: ${keys.join(', ')}`, 'info');
+                    } else {
+                        addLog(testId, `  ${pageId}: No data (will use defaults)`, 'warning');
+                    }
+                }
+                
+                setStatus(testId, 'success');
+                return true;
+            } catch (err) {
+                addLog(testId, `Exception: ${err.message}`, 'error');
+                setStatus(testId, 'error');
+                return false;
+            }
+        }
+
+        window.runAllTests = async function() {
+            const button = document.getElementById('runTests');
+            button.disabled = true;
+            button.textContent = 'Running Tests...';
+            
+            testResults = [];
+            
+            // Clear all logs
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`test${i}-log`).innerHTML = '';
+                setStatus(`test${i}`, 'pending');
+            }
+            
+            document.getElementById('summary').style.display = 'none';
+            
+            // Run all tests
+            testResults.push({ name: 'Database Connection', passed: await test1_databaseConnection() });
+            testResults.push({ name: 'Read Data', passed: await test2_readData() });
+            testResults.push({ name: 'Write Data', passed: await test3_writeData() });
+            testResults.push({ name: 'Update Data', passed: await test4_updateData() });
+            testResults.push({ name: 'CMS Pages Check', passed: await test5_checkCMSPages() });
+            
+            // Show summary
+            const passedCount = testResults.filter(r => r.passed).length;
+            const totalCount = testResults.length;
+            
+            const summary = document.getElementById('summary');
+            const score = document.getElementById('score');
+            const message = document.getElementById('summary-message');
+            
+            score.textContent = `${passedCount}/${totalCount} Tests Passed`;
+            
+            if (passedCount === totalCount) {
+                score.style.color = '#10b981';
+                message.innerHTML = `
+                    <p style="font-size: 1.2rem; margin-bottom: 1rem;">🎉 All tests passed!</p>
+                    <p>✅ Your database connection is working correctly!</p>
+                    <p>✅ The admin interface can read and write data.</p>
+                    <p style="margin-top: 1rem;">Next: Go to <a href="/admin" style="color: #60a5fa;">/admin</a> and test editing content.</p>
+                `;
+            } else {
+                score.style.color = '#f59e0b';
+                message.innerHTML = `
+                    <p style="font-size: 1.2rem; margin-bottom: 1rem;">⚠ Some tests failed</p>
+                    <p>Please check the error messages above and ensure:</p>
+                    <ol style="text-align: left; max-width: 500px; margin: 1rem auto;">
+                        <li>Supabase credentials are correct in .env.local</li>
+                        <li>The database schema has been created</li>
+                        <li>RLS policies are properly configured</li>
+                    </ol>
+                `;
+            }
+            
+            summary.style.display = 'block';
+            
+            button.disabled = false;
+            button.textContent = 'Run All Tests Again';
+        };
+    </script>
+</body>
+</html>

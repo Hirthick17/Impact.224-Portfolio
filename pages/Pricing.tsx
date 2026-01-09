@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
+import { useCMSContent } from '../context/CMSContext';
+import { PricingPageData } from '../admin/types';
+import { defaultPricingData } from '../admin/schemas/pricingSchema';
 import { Button, ScrollReveal } from '../components/UIComponents';
 import { Users, TrendingUp, Globe, Smartphone, Lightbulb, BarChart3, Check, ArrowRight } from 'lucide-react';
 
@@ -26,389 +29,94 @@ interface ServicePricing {
   tiers: PricingTier[];
 }
 
-const pricingData: ServicePricing[] = [
-  {
-    id: 'personal-branding',
-    title: 'Personal Branding',
-    subtitle: 'Establish your authority and build a powerful online identity.',
-    icon: Users,
-    serviceLink: '/services/web-development',
-    tiers: [
-      {
-        name: 'BASIC',
-        tagline: 'Best for: Beginners, early-stage founders',
-        goal: 'GOAL: ESTABLISH A PRESENCE',
-        includes: [
-          'LinkedIn & Instagram (2 platforms)',
-          '8 posts/month',
-          'Profile optimization',
-          'Content strategy + calendar',
-          'Monthly report'
-        ],
-        pricing: {
-          inIndia: '₹18,000–₹25,000/month',
-          international: '$250–$350/month'
+// Helper function to build pricing data from CMS
+const buildPricingDataFromCMS = (cmsData: PricingPageData): ServicePricing[] => {
+  const buildService = (
+    id: string,
+    serviceData: any,
+    icon: React.ElementType,
+    serviceLink: string
+  ): ServicePricing => {
+    // Safety check: if serviceData is undefined, return empty structure
+    if (!serviceData || !serviceData.tier1 || !serviceData.tier2 || !serviceData.tier3) {
+      return {
+        id,
+        title: '',
+        subtitle: '',
+        icon,
+        serviceLink,
+        tiers: [],
+      };
+    }
+
+    return {
+      id,
+      title: serviceData.serviceTitle || '',
+      subtitle: serviceData.serviceSubtitle || '',
+      icon,
+      serviceLink,
+      tiers: [
+        {
+          name: serviceData.tier1.name || '',
+          tagline: serviceData.tier1.tagline || '',
+          goal: serviceData.tier1.goal || '',
+          includes: (serviceData.tier1.includes || '').split('\n').filter((s: string) => s.trim()),
+          pricing: {
+            inIndia: serviceData.tier1.pricingInIndia || '',
+            international: serviceData.tier1.pricingInternational || '',
+          },
+          note: serviceData.tier1.note || '',
+          popular: serviceData.tier1.popular === true || serviceData.tier1.popular === 'true',
         },
-        note: '*Why: Build a credible presence before you can play "fast" personal branding.'
-      },
-      {
-        name: 'STANDARD',
-        tagline: 'Best for: Growing founders, startup leaders',
-        goal: 'GOAL: CONSISTENT REACH + FOLLOWERS GROWTH',
-        includes: [
-          'LinkedIn + Instagram',
-          '12–15 posts/month',
-          '1 video/month',
-          'Storytelling + repurposing',
-          'Monthly analytics'
-        ],
-        pricing: {
-          inIndia: '₹40,000–₹60,000/month',
-          international: '$600–$900/month'
+        {
+          name: serviceData.tier2.name || '',
+          tagline: serviceData.tier2.tagline || '',
+          goal: serviceData.tier2.goal || '',
+          includes: (serviceData.tier2.includes || '').split('\n').filter((s: string) => s.trim()),
+          pricing: {
+            inIndia: serviceData.tier2.pricingInIndia || '',
+            international: serviceData.tier2.pricingInternational || '',
+          },
+          note: serviceData.tier2.note || '',
+          popular: serviceData.tier2.popular === true || serviceData.tier2.popular === 'true',
         },
-        note: '*Why: This is your sweet-spot package — serious results without over-investing.',
-        popular: true
-      },
-      {
-        name: 'PREMIUM',
-        tagline: 'Best for: Thought-leaders, founders, exec creators',
-        goal: 'GOAL: DOMINATE YOUR NICHE',
-        includes: [
-          '3–4 platforms',
-          '20–30 posts/month',
-          '3–5 reels/shorts',
-          'Ghostwriting + automation',
-          'Weekly reviews + manager'
-        ],
-        pricing: {
-          inIndia: '₹90,000–₹1,50,000/month',
-          international: '$1,500–$3,000/month'
+        {
+          name: serviceData.tier3.name || '',
+          tagline: serviceData.tier3.tagline || '',
+          goal: serviceData.tier3.goal || '',
+          includes: (serviceData.tier3.includes || '').split('\n').filter((s: string) => s.trim()),
+          pricing: {
+            inIndia: serviceData.tier3.pricingInIndia || '',
+            international: serviceData.tier3.pricingInternational || '',
+          },
+          note: serviceData.tier3.note || '',
+          popular: serviceData.tier3.popular === true || serviceData.tier3.popular === 'true',
         },
-        note: '*Why: Premium-level tools for people with strategy, and authority.'
-      }
-    ]
-  },
-  {
-    id: 'social-media-growth',
-    title: 'Social Media Growth',
-    subtitle: 'Build engaged communities and drive meaningful connections.',
-    icon: TrendingUp,
-    serviceLink: '/services/digital-marketing',
-    tiers: [
-      {
-        name: 'BASIC',
-        tagline: 'Best for: New brands / creators with low-mid budgets',
-        goal: 'GOAL: TAX COMMITMENT + START ORGANIC REACH',
-        includes: [
-          'Growth work',
-          'Platform optimization',
-          'Monthly outreach optimization',
-          'Organic engagement strategy',
-          'Hashtag + keyword research',
-          'Trend & format guidance'
-        ],
-        pricing: {
-          inIndia: '₹15,000–₹25,000/month',
-          international: '$200–$350/month'
-        },
-        note: '*Why: Builds the foundation for organic growth.'
-      },
-      {
-        name: 'STANDARD',
-        tagline: 'Best for: Founders & brands ready to scale with paid ads',
-        goal: 'GOAL: CONSISTENT REACH + FOLLOWERS GROWTH',
-        includes: [
-          'Daily engagement outreach',
-          'Paid/Organic strategy',
-          'Content amplification planning',
-          'Automation framework',
-          'Collaboration & influencer planning',
-          'Automation & batch monitoring'
-        ],
-        pricing: {
-          inIndia: '₹35,000–₹55,000/month',
-          international: '$500–$800/month'
-        },
-        note: '*Why: Focuses on building real community connections.',
-        popular: true
-      },
-      {
-        name: 'PREMIUM',
-        tagline: 'Best for: Established founders',
-        goal: 'GOAL: ACCELERATE GROWTH + DOMINATE AT NICHE',
-        includes: [
-          'Advanced distribution systems',
-          'Creator & influencer outreach',
-          'Trend hijacking (micro)',
-          'High-volume engagement workflows',
-          'Automation (bots/APIs)',
-          'Platform expansion planning'
-        ],
-        pricing: {
-          inIndia: '₹70,000–₹1,20,000/month',
-          international: '$1,200–$2,500/month'
-        },
-        note: '*Why: Maximum leverage for brands with high volume.'
-      }
-    ]
-  },
-  {
-    id: 'website-development',
-    title: 'Website Development',
-    subtitle: 'High-performance, conversion-driven digital assets built for speed.',
-    icon: Globe,
-    serviceLink: '/services/web-development',
-    tiers: [
-      {
-        name: 'BASIC',
-        tagline: 'Best for: Tryout, brands, startups',
-        goal: 'GOAL: ESTABLISH A CAPABLE + TRUST ONLINE PRESENCE',
-        includes: [
-          '1-3 page website',
-          'Mobile-responsive design',
-          'Clean UI/UX',
-          'Basic SEO structure',
-          'Speed optimization',
-          'Domain & hosting support'
-        ],
-        pricing: {
-          inIndia: '₹40,000–₹60,000 (one-time)',
-          international: '$700–$1,200'
-        },
-        note: '*Why: Affordable for launching a professional online.'
-      },
-      {
-        name: 'STANDARD',
-        tagline: 'Best for: Mid-size service businesses',
-        goal: 'GOAL: DRIVE LEADS, CONVERSIONS & TRUST',
-        includes: [
-          '6+ pages',
-          'Custom UI/UX',
-          'CMS integration',
-          'Conversion-focused copywriting',
-          'Analytics (GA4)',
-          'Lead capture system'
-        ],
-        pricing: {
-          inIndia: '₹90,000–₹1,50,000',
-          international: '$1,500–$3,000'
-        },
-        note: '*Why: Turns visitors into recurring customers.',
-        popular: true
-      },
-      {
-        name: 'PREMIUM',
-        tagline: 'Best for: SaaS, enterprise, high-growth brands',
-        goal: 'GOAL: HIGH-PERFORMANCE, SCALE-READY DIGITAL ASSET',
-        includes: [
-          'Unlimited pages',
-          'Advanced animations',
-          'Custom dashboards / portals',
-          'Integrations (CRM, payment, APIs)',
-          'Security hardening',
-          '30-day post-launch support'
-        ],
-        pricing: {
-          inIndia: '₹2,00,000–₹5,00,000+',
-          international: '$4,000–$10,000+'
-        },
-        note: '*Why: Enterprise-grade speed and reliability.'
-      }
-    ]
-  },
-  {
-    id: 'app-development',
-    title: 'App Development',
-    subtitle: 'Scalable mobile and web applications engineered for the future.',
-    icon: Smartphone,
-    serviceLink: '/services/web-development',
-    tiers: [
-      {
-        name: 'BASIC',
-        tagline: 'Best for: Startup MVPs, no-frills',
-        goal: 'GOAL: LAUNCH FAST, VALIDATE IDEA',
-        includes: [
-          'MVP planning',
-          'UI/UX wireframes',
-          'Core features only',
-          'Android or iOS',
-          'Backend integration',
-          'Basic testing'
-        ],
-        pricing: {
-          inIndia: '₹2,00,000–₹4,00,000',
-          international: '$4,000–$7,000'
-        },
-        note: '*Why: Validates concepts with minimal spend.'
-      },
-      {
-        name: 'STANDARD',
-        tagline: 'Best for: Growing startups',
-        goal: 'GOAL: STABLE, SCALABLE APP',
-        includes: [
-          'Cross-platform (Flutter / React Native)',
-          'Authentication',
-          'Database + APIs',
-          'Admin dashboard',
-          'Push notifications',
-          'Analytics'
-        ],
-        pricing: {
-          inIndia: '₹5,00,000–₹10,00,000',
-          international: '$8,000–$15,000'
-        },
-        note: '*Why: Built for actual users and scale.',
-        popular: true
-      },
-      {
-        name: 'PREMIUM',
-        tagline: 'Best for: Funded startups',
-        goal: 'GOAL: HIGH-SCALE, SECURE APPLICATION',
-        includes: [
-          'Advanced architecture',
-          'Role-based access',
-          'Cloud deployment',
-          'Security audits',
-          'Load testing',
-          'Maintenance support'
-        ],
-        pricing: {
-          inIndia: '₹12,00,000–₹25,00,000+',
-          international: '$20,000–$50,000+'
-        },
-        note: '*Why: Zero-compromise on performance and security.'
-      }
-    ]
-  },
-  {
-    id: 'growth-marketing',
-    title: 'Growth & Digital Marketing',
-    subtitle: 'Build predictable revenue and scale profitably with full-funnel marketing.',
-    icon: BarChart3,
-    serviceLink: '/services/digital-marketing',
-    tiers: [
-      {
-        name: 'STARTER',
-        tagline: 'Best for: Early-stage brands, solopreneurs',
-        goal: 'GOAL: INCREASE REACH + AWARENESS WITH CONTROLLED SPEND',
-        includes: [
-          'Profile audit',
-          'Organic engagement',
-          'Meta/Google Ad setup',
-          '1 campaign (awareness)',
-          'Audience targeting',
-          'Budget monitoring'
-        ],
-        pricing: {
-          inIndia: '₹25,000–₹40,000/month',
-          international: '$350–$600/month'
-        },
-        note: '*Why: Ideal for establishing a market foothold.'
-      },
-      {
-        name: 'GROWTH',
-        tagline: 'Best for: Startups, D2C brands',
-        goal: 'GOAL: GENERATE LEADS, INQUIRIES, AND CONVERSIONS',
-        includes: [
-          'Funnel strategy (TOF/MOF/BOF)',
-          'Up to 3 ad campaigns',
-          'Ad copywriting',
-          'Creative variations',
-          'Retargeting setup',
-          'Weekly performance check'
-        ],
-        pricing: {
-          inIndia: '₹60,000–₹1,00,000/month',
-          international: '$900–$1,800/month'
-        },
-        note: '*Why: Engineered for scaling revenue profitably.',
-        popular: true
-      },
-      {
-        name: 'SCALE',
-        tagline: 'Best for: High-growth brands, serious founders',
-        goal: 'GOAL: BUILD PREDICTABLE REVENUE & SCALE PROFITABLY',
-        includes: [
-          'Full-funnel performance marketing',
-          'Conversion Rate Optimization (CRO)',
-          'Advanced retargeting',
-          'Marketing automation',
-          'Dedicated account manager'
-        ],
-        pricing: {
-          inIndia: '₹1,50,000–₹3,00,000+/month',
-          international: '$2,500–$6,000+/month'
-        },
-        note: '*Why: Dominate the market with high-volume growth.'
-      }
-    ]
-  },
-  {
-    id: 'strategy-execution',
-    title: 'Strategy & Execution',
-    subtitle: 'Clarify your direction and grow your growth with high-level advisory.',
-    icon: Lightbulb,
-    serviceLink: '/services/web-development',
-    tiers: [
-      {
-        name: 'STARTER',
-        tagline: 'Best for: Early-stage startups, new brands',
-        goal: 'GOAL: CLARIFY WHAT TO TARGET AND WHAT TO SAY',
-        includes: [
-          'Brand & market audit',
-          'ICP definition',
-          'Competitor analysis',
-          'Core messaging',
-          '30-day marketing plan'
-        ],
-        pricing: {
-          inIndia: '₹25,000–₹40,000 (one-time)',
-          international: '$400–$700'
-        },
-        note: '*Why: Builds trust and opens doors to resources.'
-      },
-      {
-        name: 'GROWTH',
-        tagline: 'Best for: Startups & service brands ready to scale',
-        goal: 'GOAL: CREATE CONSISTENT INBOUND LEADS & VISIBILITY',
-        includes: [
-          'Full-funnel strategy',
-          'Content marketing roadmap',
-          'Lead generation strategy',
-          'KPI tracking',
-          'Monthly strategic call'
-        ],
-        pricing: {
-          inIndia: '₹60,000–₹1,00,000/month',
-          international: '$1,000–$2,000/month'
-        },
-        note: '*Why: Our most "Wedding + planning" package.',
-        popular: true
-      },
-      {
-        name: 'PREMIUM',
-        tagline: 'Best for: Funded startups, scaling brands',
-        goal: 'GOAL: OWN MARKETING DECISIONS, GROWTH DIRECTION & EXPERIMENTS',
-        includes: [
-          'Go-to-Market (GTM) strategy',
-          'Revenue & growth forecasting',
-          'Multi-channel orchestration',
-          'Weekly growth experiments',
-          'Dedicated marketing lead'
-        ],
-        pricing: {
-          inIndia: '₹1,50,000–₹3,00,000+/month',
-          international: '$3,000–$6,000+/month'
-        },
-        note: '*Why: Premium clients pay for dividends, not deliverables.'
-      }
-    ]
-  }
-];
+      ],
+    };
+  };
+
+  return [
+    buildService('personal-branding', cmsData.personalBranding, Users, '/services/visual-storytelling'),
+    buildService('social-media-growth', cmsData.socialMediaGrowth, TrendingUp, '/services/digital-marketing'),
+    buildService('website-development', cmsData.websiteDevelopment, Globe, '/services/web-development'),
+    buildService('app-development', cmsData.appDevelopment, Smartphone, '/services/web-development'),
+    buildService('growth-marketing', cmsData.growthMarketing, BarChart3, '/services/digital-marketing'),
+    buildService('strategy-execution', cmsData.strategyExecution, Lightbulb, '/services/web-development'),
+  ];
+};
 
 export const Pricing: React.FC = () => {
   const { getAccentColorClass } = useTheme();
   const [selectedService, setSelectedService] = useState<string>('all');
+  const cmsData = useCMSContent<PricingPageData>('pricing');
+  
+  // Build pricing data from CMS, fallback to default if CMS data is incomplete
+  const pricingDataFromCMS = buildPricingDataFromCMS(cmsData);
+  const pricingDataFromDefault = buildPricingDataFromCMS(defaultPricingData);
+  
+  // Use CMS data if first service has a title, otherwise use default
+  const pricingData = pricingDataFromCMS[0]?.title ? pricingDataFromCMS : pricingDataFromDefault;
 
   const filteredServices = selectedService === 'all' 
     ? pricingData 
@@ -418,8 +126,12 @@ export const Pricing: React.FC = () => {
     <div className="pt-10">
       {/* Hero Section */}
       <ScrollReveal className="text-center px-6 mb-16">
-        <span className={`text-sm font-bold uppercase tracking-widest ${getAccentColorClass('text')}`}>Pricing & Packages</span>
-        <h1 className="text-4xl md:text-6xl font-bold mt-2 text-neutral-900 dark:text-white">Scale Your Business Profits</h1>
+        <span className={`text-sm font-bold uppercase tracking-widest ${getAccentColorClass('text')}`}>
+          {cmsData.pageHeader?.pageTitle || 'Pricing & Packages'}
+        </span>
+        <h1 className="text-4xl md:text-6xl font-bold mt-2 text-neutral-900 dark:text-white">
+          {cmsData.pageHeader?.pageSubtitle || 'Scale Your Business Profits'}
+        </h1>
         <p className="text-lg text-neutral-500 mt-4 max-w-2xl mx-auto">
           Transparent pricing for world-class digital execution. No hidden fees. Just ROI.
         </p>

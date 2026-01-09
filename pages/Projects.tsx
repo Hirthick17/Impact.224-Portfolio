@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { SectionHeader, Button, ScrollReveal } from '../components/UIComponents';
 import { useTheme } from '../context/ThemeContext';
-import { projectsData } from '../data';
+import { useCMSContent } from '../context/CMSContext';
+import { ProjectsPageData } from '../admin/types';
 import { NavLink } from 'react-router-dom';
 
 type Category = 'All' | 'Website Development' | 'Digital Marketing' | 'Video Editing';
@@ -9,14 +10,60 @@ type Category = 'All' | 'Website Development' | 'Digital Marketing' | 'Video Edi
 export const Projects: React.FC = () => {
   const [filter, setFilter] = useState<Category>('All');
   const { getAccentColorClass } = useTheme();
+  
+  // Get CMS data for projects page
+  const cmsData = useCMSContent<ProjectsPageData>('projects');
 
-  const filteredProjects = filter === 'All' ? projectsData : projectsData.filter(p => p.category === filter);
+  // Convert CMS data to array format for rendering
+  const projectsArray = [
+    {
+      id: 1,
+      slug: 'fintech-dashboard',
+      title: cmsData.project1?.projectTitle || '',
+      category: 'Website Development',
+      image: cmsData.project1?.featuredImage || '',
+      stats: cmsData.project1?.headlineResultStat || '',
+      client: cmsData.project1?.clientName || '',
+      duration: cmsData.project1?.projectDuration || '',
+      challenge: cmsData.project1?.theChallenge || '',
+      solution: cmsData.project1?.theSolution || '',
+      results: cmsData.project1?.results?.split('\n') || []
+    },
+    {
+      id: 2,
+      slug: 'nike-campaign',
+      title: cmsData.project2?.projectTitle || '',
+      category: 'Digital Marketing',
+      image: cmsData.project2?.featuredImage || '',
+      stats: cmsData.project2?.headlineResultStat || '',
+      client: cmsData.project2?.clientName || '',
+      duration: cmsData.project2?.projectDuration || '',
+      challenge: cmsData.project2?.theChallenge || '',
+      solution: cmsData.project2?.theSolution || '',
+      results: cmsData.project2?.results?.split('\n') || []
+    },
+    {
+      id: 3,
+      slug: 'tech-talks',
+      title: cmsData.project3?.projectTitle || '',
+      category: 'Video Editing',
+      image: cmsData.project3?.featuredImage || '',
+      stats: cmsData.project3?.headlineResultStat || '',
+      client: cmsData.project3?.clientName || '',
+      duration: cmsData.project3?.projectDuration || '',
+      challenge: cmsData.project3?.theChallenge || '',
+      solution: cmsData.project3?.theSolution || '',
+      results: cmsData.project3?.results?.split('\n') || []
+    }
+  ];
+
+  const filteredProjects = filter === 'All' ? projectsArray : projectsArray.filter(p => p.category === filter);
 
   return (
     <div className="px-6 py-20 max-w-7xl mx-auto min-h-screen">
       <SectionHeader 
-        title="Our Work" 
-        subtitle="A collection of projects that have generated millions in revenue for our clients." 
+        title={cmsData.pageHeader?.pageTitle || 'Our Work'} 
+        subtitle={cmsData.pageHeader?.pageSubtitle || 'A collection of projects that have generated millions in revenue for our clients.'} 
         centered 
       />
       

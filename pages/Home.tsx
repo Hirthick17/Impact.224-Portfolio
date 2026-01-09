@@ -2,11 +2,15 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Button, Card, SectionHeader, Badge, ScrollReveal } from '../components/UIComponents';
 import { useTheme } from '../context/ThemeContext';
+import { useCMSContent } from '../context/CMSContext';
+import { HomePageData } from '../admin/types';
 import { Globe, BarChart3, PenTool, Zap, CheckCircle2, TrendingUp, Users, ArrowRight } from 'lucide-react';
 import { servicesData, blogPosts, projectsData } from '../data';
 
 export const Home: React.FC = () => {
   const { getAccentColorClass } = useTheme();
+  const cmsData = useCMSContent<HomePageData>('home');
+
 
   return (
     <>
@@ -15,7 +19,7 @@ export const Home: React.FC = () => {
         {/* Background Image with 30% Opacity */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=2000" 
+            src={cmsData.hero?.backgroundImage || "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=2000"} 
             alt="Agency Background" 
             className="w-full h-full object-cover opacity-30"
           />
@@ -43,15 +47,15 @@ export const Home: React.FC = () => {
         {/* Hero Content - Left Aligned */}
         <div className="relative px-6 py-12 md:py-24 max-w-7xl mx-auto w-full z-10">
           <ScrollReveal className="space-y-8 max-w-3xl">
-            <Badge text="Digital Growth Agency" />
+            <Badge text={cmsData.hero?.tagline || "Digital Growth Agency"} />
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-white">
-              Stop Losing <br/>
+              {cmsData.hero?.headline || "Stop Losing"} <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-neutral-400">
                 Leads Online.
               </span>
             </h1>
             <p className="text-lg md:text-xl text-neutral-400 max-w-2xl leading-relaxed">
-              We build high-performance websites and automated marketing systems that turn silent visitors into loyal customers.
+              {cmsData.hero?.description || "We build high-performance websites and automated marketing systems that turn silent visitors into loyal customers."}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <NavLink to="/contact">

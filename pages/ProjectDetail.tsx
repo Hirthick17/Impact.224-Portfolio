@@ -1,16 +1,58 @@
 import React from 'react';
 import { useParams, Navigate, NavLink } from 'react-router-dom';
-import { projectsData } from '../data';
-import { ScrollReveal, Button, Badge } from '../components/UIComponents';
+import { useCMSContent } from '../context/CMSContext';
+import { ProjectsPageData } from '../admin/types';
+import { ScrollReveal, Button } from '../components/UIComponents';
 import { useTheme } from '../context/ThemeContext';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 export const ProjectDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const project = projectsData.find(p => p.slug === slug);
   const { getAccentColorClass } = useTheme();
+  
+  // Get CMS data for projects page
+  const cmsData = useCMSContent<ProjectsPageData>('projects');
 
-  if (!project) {
+  // Map slug to project data from CMS
+  const projectMap: Record<string, any> = {
+    'fintech-dashboard': {
+      title: cmsData.project1?.projectTitle || '',
+      category: 'Website Development',
+      image: cmsData.project1?.featuredImage || '',
+      stats: cmsData.project1?.headlineResultStat || '',
+      client: cmsData.project1?.clientName || '',
+      duration: cmsData.project1?.projectDuration || '',
+      challenge: cmsData.project1?.theChallenge || '',
+      solution: cmsData.project1?.theSolution || '',
+      results: cmsData.project1?.results?.split('\n').filter(r => r.trim()) || []
+    },
+    'nike-campaign': {
+      title: cmsData.project2?.projectTitle || '',
+      category: 'Digital Marketing',
+      image: cmsData.project2?.featuredImage || '',
+      stats: cmsData.project2?.headlineResultStat || '',
+      client: cmsData.project2?.clientName || '',
+      duration: cmsData.project2?.projectDuration || '',
+      challenge: cmsData.project2?.theChallenge || '',
+      solution: cmsData.project2?.theSolution || '',
+      results: cmsData.project2?.results?.split('\n').filter(r => r.trim()) || []
+    },
+    'tech-talks': {
+      title: cmsData.project3?.projectTitle || '',
+      category: 'Video Editing',
+      image: cmsData.project3?.featuredImage || '',
+      stats: cmsData.project3?.headlineResultStat || '',
+      client: cmsData.project3?.clientName || '',
+      duration: cmsData.project3?.projectDuration || '',
+      challenge: cmsData.project3?.theChallenge || '',
+      solution: cmsData.project3?.theSolution || '',
+      results: cmsData.project3?.results?.split('\n').filter(r => r.trim()) || []
+    }
+  };
+
+  const project = slug ? projectMap[slug] : null;
+
+  if (!project || !project.title) {
     return <Navigate to="/projects" />;
   }
 
@@ -57,7 +99,7 @@ export const ProjectDetail: React.FC = () => {
              <ScrollReveal delay={200}>
                 <h2 className="text-2xl font-bold mb-6 border-b border-neutral-200 dark:border-neutral-800 pb-2">Key Results</h2>
                 <div className="grid gap-4">
-                    {project.results.map((result, i) => (
+                    {project.results.map((result: string, i: number) => (
                         <div key={i} className="flex items-start gap-4 bg-neutral-50 dark:bg-neutral-900 p-6 rounded-xl">
                              <div className={`mt-1 ${getAccentColorClass('text')}`}>
                                 <CheckCircle2 size={24} />

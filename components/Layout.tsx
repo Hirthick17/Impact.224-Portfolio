@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { Button } from './UIComponents';
-import { Lightbulb, Menu, X, Moon, Sun, Palette, Mail, Linkedin, Instagram, ChevronDown } from 'lucide-react';
+import { Lightbulb, Menu, X, Moon, Sun, Palette, Mail, Linkedin, Instagram, ChevronDown, Lock } from 'lucide-react';
 import { servicesData } from '../data';
 
 const links = [
@@ -14,7 +14,7 @@ const links = [
   { name: 'About', path: '/about' },
 ];
 
-export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -142,6 +142,16 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 )}
               </div>
             ))}
+            
+            {/* Admin Access Icon */}
+            <NavLink 
+              to="/admin/login"
+              className="p-2 rounded-lg hover:bg-neutral-800 transition-colors group"
+              title="Admin Access"
+            >
+              <Lock className="w-5 h-5 text-neutral-400 group-hover:text-yellow-400 transition-colors" />
+            </NavLink>
+            
             <NavLink to="/contact">
               <Button size="sm" variant="secondary" className="rounded-lg px-6 bg-white text-black font-bold normal-case tracking-normal">Contact Us</Button>
             </NavLink>

@@ -1,21 +1,26 @@
 import React from 'react';
 import { SectionHeader, Button, ScrollReveal, Badge, Card } from '../components/UIComponents';
 import { useTheme } from '../context/ThemeContext';
+import { useCMSContent } from '../context/CMSContext';
+import { BlogPageData } from '../admin/types';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { blogPosts } from '../data';
 
 export const Blog: React.FC = () => {
   const { getAccentColorClass } = useTheme();
+  const cmsData = useCMSContent<BlogPageData>('blog');
 
   return (
     <div className="px-6 py-20 max-w-7xl mx-auto min-h-screen">
       <div className="text-center max-w-3xl mx-auto mb-16">
         <ScrollReveal>
-            <Badge text="Our Thoughts" />
-            <h1 className="text-4xl md:text-6xl font-bold mt-4 mb-6 text-neutral-900 dark:text-white">Insights for Growth</h1>
+            <Badge text={cmsData.pageHeader?.badge || 'Our Thoughts'} />
+            <h1 className="text-4xl md:text-6xl font-bold mt-4 mb-6 text-neutral-900 dark:text-white">
+              {cmsData.pageHeader?.mainHeading || 'Insights for Growth'}
+            </h1>
             <p className="text-lg text-neutral-600 dark:text-neutral-400">
-                Actionable strategies, technical deep dives, and marketing trends to help you stay ahead of the curve.
+                {cmsData.pageHeader?.subHeading || 'Actionable strategies, technical deep dives, and marketing trends to help you stay ahead of the curve.'}
             </p>
         </ScrollReveal>
       </div>
