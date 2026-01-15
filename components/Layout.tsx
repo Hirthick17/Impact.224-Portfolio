@@ -4,6 +4,8 @@ import { useTheme } from '../context/ThemeContext';
 import { Button } from './UIComponents';
 import { Lightbulb, Menu, X, Moon, Sun, Palette, Mail, Linkedin, Instagram, ChevronDown, Lock } from 'lucide-react';
 import { servicesData } from '../data';
+import { useCMSContent } from '../context/CMSContext';
+import { NewsletterPageData, FooterPageData} from '../admin/types';
 
 const links = [
   { name: 'Home', path: '/' },
@@ -22,6 +24,8 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
   const { isDarkMode, toggleDarkMode, accentColor, setAccentColor, getAccentColorClass } = useTheme();
   const [showThemePanel, setShowThemePanel] = useState(false);
   const location = useLocation();
+  const newsletterData = useCMSContent<NewsletterPageData>('newsletter');
+  const footerData = useCMSContent<FooterPageData>('footer');
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -191,15 +195,23 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
       <section className="py-16 px-6 bg-neutral-50 dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
           <div className="max-w-xl">
-            <h3 className="text-3xl font-bold mb-2 text-neutral-900 dark:text-white">Subscribe to our newsletter</h3>
-            <p className="text-neutral-500">Stay updated with our latest insights and exclusive content.</p>
+            <h3 className="text-3xl font-bold mb-2 text-neutral-900 dark:text-white">
+              {newsletterData?.newsletterCTA?.heading || "Subscribe to our newsletter"}
+            </h3>
+            <p className="text-neutral-500">
+              {newsletterData?.newsletterCTA?.subheading || "Stay updated with our latest insights and exclusive content."}
+            </p>
           </div>
           <div className="flex gap-4">
-             <NavLink to="/projects">
-               <Button variant="outline">Case Studies</Button>
+             <NavLink to={newsletterData?.newsletterCTA?.button1Link || "/projects"}>
+               <Button variant="outline">
+                 {newsletterData?.newsletterCTA?.button1Text || "Case Studies"}
+               </Button>
              </NavLink>
-             <NavLink to="/contact">
-                <Button>Scale Your Business</Button>
+             <NavLink to={newsletterData?.newsletterCTA?.button2Link || "/contact"}>
+                <Button>
+                  {newsletterData?.newsletterCTA?.button2Text || "Scale Your Business"}
+                </Button>
              </NavLink>
           </div>
         </div>
@@ -212,23 +224,23 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-start mb-4">
               <span className="font-script text-3xl font-bold text-white leading-none">
-                Impact
+                {footerData?.branding?.brandName || "Impact"}
               </span>
               <span className="font-sans text-xs font-bold text-neutral-400 -mt-1 ml-1">
-                224
+                {footerData?.branding?.brandNumber || "224"}
               </span>
             </div>
             <p className="text-neutral-300 text-sm mb-6 leading-relaxed">
-              Empowering students to craft their careers, build skills, and connect with opportunities that matter.
+              {footerData?.branding?.description || "Empowering students to craft their careers, build skills, and connect with opportunities that matter."}
             </p>
             <div className="flex gap-3">
-              <a href="#" className="p-2 rounded bg-neutral-800 hover:bg-neutral-700 transition-colors text-white">
+              <a href={footerData?.socialMedia?.linkedinUrl || "#"} className="p-2 rounded bg-neutral-800 hover:bg-neutral-700 transition-colors text-white">
                 <Linkedin size={18} />
               </a>
-              <a href="#" className="p-2 rounded bg-neutral-800 hover:bg-neutral-700 transition-colors text-white">
+              <a href={footerData?.socialMedia?.instagramUrl || "#"} className="p-2 rounded bg-neutral-800 hover:bg-neutral-700 transition-colors text-white">
                 <Instagram size={18} />
               </a>
-              <a href="#" className="p-2 rounded bg-neutral-800 hover:bg-neutral-700 transition-colors text-white">
+              <a href={footerData?.socialMedia?.youtubeUrl || "#"} className="p-2 rounded bg-neutral-800 hover:bg-neutral-700 transition-colors text-white">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                 </svg>
@@ -238,7 +250,7 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
 
           {/* Resources - Navigation Links */}
           <div>
-            <h4 className="font-bold text-white mb-4">Resources</h4>
+            <h4 className="font-bold text-white mb-4">{footerData?.resources?.sectionTitle || "Resources"}</h4>
             <ul className="space-y-2 text-sm">
               <li><NavLink to="/" className="text-neutral-300 hover:text-white transition-colors">Home</NavLink></li>
               <li><NavLink to="/services" className="text-neutral-300 hover:text-white transition-colors">Services</NavLink></li>
@@ -250,26 +262,26 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
 
           {/* Contact Us */}
           <div>
-            <h4 className="font-bold text-white mb-4">Contact Us</h4>
+            <h4 className="font-bold text-white mb-4">{footerData?.contact?.sectionTitle || "Contact Us"}</h4>
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2">
                 <Mail size={16} className="mt-1 flex-shrink-0" />
-                <a href="mailto:hello@impact.224@gmail.com" className="text-neutral-300 hover:text-white transition-colors">
-                  hello@impact.224@gmail.com
+                <a href={`mailto:${footerData?.contact?.email || "hello@impact.224@gmail.com"}`} className="text-neutral-300 hover:text-white transition-colors">
+                  {footerData?.contact?.email || "hello@impact.224@gmail.com"}
                 </a>
               </li>
               <li className="flex items-start gap-2">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mt-1 flex-shrink-0">
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                 </svg>
-                <span className="text-neutral-300">+91 99880 66050</span>
+                <span className="text-neutral-300">{footerData?.contact?.phone || "+91 99880 66050"}</span>
               </li>
               <li className="flex items-start gap-2">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mt-1 flex-shrink-0">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                   <circle cx="12" cy="10" r="3"/>
                 </svg>
-                <span className="text-neutral-300">Ludhiana, Punjab</span>
+                <span className="text-neutral-300">{footerData?.contact?.location || "Ludhiana, Punjab"}</span>
               </li>
             </ul>
           </div>
@@ -277,7 +289,7 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
 
         {/* Bottom Section */}
         <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-neutral-800 flex justify-center">
-          <p className="text-neutral-400 text-sm">© 2025 Impact.224. All rights reserved.</p>
+          <p className="text-neutral-400 text-sm">{footerData?.copyright?.copyrightText || "© 2025 Impact.224. All rights reserved."}</p>
         </div>
       </footer>
 

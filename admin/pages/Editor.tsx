@@ -14,6 +14,11 @@ import { projectsSchema, defaultProjectsData } from '../schemas/projectsSchema';
 import { serviceWebDevSchema, defaultServiceWebDevData } from '../schemas/serviceWebDevSchema';
 import { serviceMarketingSchema, defaultServiceMarketingData } from '../schemas/serviceMarketingSchema';
 import { serviceVideoSchema, defaultServiceVideoData } from '../schemas/serviceVideoSchema';
+import { newsletterSchema, defaultNewsletterData } from '../schemas/newsletterSchema';
+import { footerSchema, defaultFooterData } from '../schemas/footerSchema';
+import { blogSeo2025Schema, defaultBlogSeo2025Data } from '../schemas/blogSeo2025Schema';
+import { flatToNested, nestedToFlat } from '../utils/pricingTransform';
+import { deepMerge } from '../utils/objectUtils';
 import { FileText, BarChart3 } from 'lucide-react';
 
 const schemas: Record<string, { schema: CMSPageSchema; defaultData: any }> = {
@@ -26,6 +31,9 @@ const schemas: Record<string, { schema: CMSPageSchema; defaultData: any }> = {
   'service-web-dev': { schema: serviceWebDevSchema, defaultData: defaultServiceWebDevData },
   'service-marketing': { schema: serviceMarketingSchema, defaultData: defaultServiceMarketingData },
   'service-video': { schema: serviceVideoSchema, defaultData: defaultServiceVideoData },
+  newsletter: { schema: newsletterSchema, defaultData: defaultNewsletterData },
+  footer: { schema: footerSchema, defaultData: defaultFooterData },
+  'blog-seo-2025': { schema: blogSeo2025Schema, defaultData: defaultBlogSeo2025Data },
 };
 
 export const AdminEditor: React.FC = () => {
@@ -47,11 +55,33 @@ export const AdminEditor: React.FC = () => {
     // Initialize with default data if not exists
     initializeCMSData(pageId, schemaConfig.defaultData);
 
-    // Load existing data
-    const data = getCMSData(pageId);
-    if (data) {
-      setFormData(data);
-    }
+    // Load existing data from Supabase (not localStorage)
+    const loadData = async () => {
+      const { getCMSContent } = await import('../../lib/cms-service');
+      const data = await getCMSContent(pageId);
+      
+      if (data) {
+        // If pricing page, ensure data is flat for the editor
+        if (pageId === 'pricing') {
+          const flatData = nestedToFlat(data as any);
+          setFormData(flatData);
+        } else {
+          // Deep merge default data with fetched data to ensure no fields are missing
+          const mergedData = deepMerge(schemaConfig.defaultData, data);
+          setFormData(mergedData);
+        }
+      } else {
+        // If no data in database, use default data
+        if (pageId === 'pricing') {
+          const flatData = nestedToFlat(schemaConfig.defaultData as any);
+          setFormData(flatData);
+        } else {
+          setFormData(schemaConfig.defaultData);
+        }
+      }
+    };
+    
+    loadData();
 
     // Set first section as active
     if (schemaConfig.schema.sections.length > 0) {
@@ -61,10 +91,8 @@ export const AdminEditor: React.FC = () => {
     // Listen for updates from other tabs
     const cleanup = onCMSUpdate((updatedPageId) => {
       if (updatedPageId === pageId) {
-        const updatedData = getCMSData(pageId);
-        if (updatedData) {
-          setFormData(updatedData);
-        }
+        // Reload from database when updated
+        loadData();
       }
     });
 
@@ -91,7 +119,15 @@ export const AdminEditor: React.FC = () => {
         dataSize: JSON.stringify(formData).length + ' bytes',
       });
       
-      saveCMSData(pageId, formData);
+      let dataToSave = formData;
+      
+      // If pricing page, transform flat form data to nested structure for DB
+      if (pageId === 'pricing') {
+        console.log('🔄 [ADMIN UI] Transforming pricing data to nested structure');
+        dataToSave = flatToNested(formData);
+      }
+      
+      saveCMSData(pageId, dataToSave);
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
     }
@@ -113,6 +149,15 @@ export const AdminEditor: React.FC = () => {
     scissors: <FileText className="w-8 h-8" />,
     dollar: <FileText className="w-8 h-8" />,
     tag: <FileText className="w-8 h-8" />,
+    mail: <FileText className="w-8 h-8" />,
+    briefcase: <BarChart3 className="w-8 h-8" />,
+    newspaper: <FileText className="w-8 h-8" />,
+    award: <BarChart3 className="w-8 h-8" />,
+    badge: <FileText className="w-8 h-8" />,
+    share: <BarChart3 className="w-8 h-8" />,
+    book: <FileText className="w-8 h-8" />,
+    phone: <BarChart3 className="w-8 h-8" />,
+    shield: <FileText className="w-8 h-8" />,
   };
 
   return (
@@ -142,9 +187,6 @@ export const AdminEditor: React.FC = () => {
                   <h2 className="text-4xl font-bold text-white uppercase tracking-wide">
                     {currentSection.title}
                   </h2>
-                  <p className="text-sm text-neutral-500 uppercase tracking-wider">
-                    Global Module Configuration
-                  </p>
                 </div>
               </div>
 

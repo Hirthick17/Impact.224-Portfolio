@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useCMSContent } from '../context/CMSContext';
-import { PricingPageData } from '../admin/types';
+import { PricingPageData, ServicePricingData } from '../admin/types';
 import { defaultPricingData } from '../admin/schemas/pricingSchema';
 import { Button, ScrollReveal } from '../components/UIComponents';
 import { Users, TrendingUp, Globe, Smartphone, Lightbulb, BarChart3, Check, ArrowRight } from 'lucide-react';
@@ -29,25 +29,62 @@ interface ServicePricing {
   tiers: PricingTier[];
 }
 
-// Helper function to build pricing data from CMS
+// Helper function to build pricing data from CMS - SIMPLIFIED
 const buildPricingDataFromCMS = (cmsData: PricingPageData): ServicePricing[] => {
   const buildService = (
     id: string,
-    serviceData: any,
+    serviceData: any, // Use any to support both flat and nested structures
     icon: React.ElementType,
     serviceLink: string
   ): ServicePricing => {
-    // Safety check: if serviceData is undefined, return empty structure
-    if (!serviceData || !serviceData.tier1 || !serviceData.tier2 || !serviceData.tier3) {
-      return {
-        id,
-        title: '',
-        subtitle: '',
-        icon,
-        serviceLink,
-        tiers: [],
-      };
+    // If no service data, return empty structure
+    if (!serviceData) {
+      console.warn(`⚠️ [PRICING] No data for: ${id}`);
+      return { id, title: '', subtitle: '', icon, serviceLink, tiers: [] };
     }
+
+    // Helper to extract tier data (Nested Object Structure ONLY)
+    const getTier = (tierKey: string): PricingTier => {
+      const tierData = serviceData[tierKey];
+
+      // Validate tier data exists
+      if (!tierData || typeof tierData !== 'object') {
+        // Return empty tier if data is missing or invalid
+        return {
+          name: '',
+          tagline: '',
+          goal: '',
+          includes: [],
+          pricing: { inIndia: '', international: '' },
+          note: '',
+          popular: false
+        };
+      }
+
+      // Map nested data structure directly
+      return {
+        name: tierData.name || '',
+        tagline: tierData.tagline || '',
+        goal: tierData.goal || '',
+        includes: (tierData.includes || '').split('\n').filter((s: string) => s.trim()),
+        pricing: {
+          inIndia: tierData.pricingInIndia || '',
+          international: tierData.pricingInternational || '',
+        },
+        note: tierData.note || '',
+        popular: tierData.popular === true,
+      };
+    };
+
+    // Build tiers
+    const tiers: PricingTier[] = [
+      getTier('tier1'),
+      getTier('tier2'),
+      getTier('tier3'),
+    ];
+
+    // Filter out empty tiers if necessary, or keep them to show incomplete data
+    // For now, we return all 3 to maintain layout
 
     return {
       id,
@@ -55,44 +92,7 @@ const buildPricingDataFromCMS = (cmsData: PricingPageData): ServicePricing[] => 
       subtitle: serviceData.serviceSubtitle || '',
       icon,
       serviceLink,
-      tiers: [
-        {
-          name: serviceData.tier1.name || '',
-          tagline: serviceData.tier1.tagline || '',
-          goal: serviceData.tier1.goal || '',
-          includes: (serviceData.tier1.includes || '').split('\n').filter((s: string) => s.trim()),
-          pricing: {
-            inIndia: serviceData.tier1.pricingInIndia || '',
-            international: serviceData.tier1.pricingInternational || '',
-          },
-          note: serviceData.tier1.note || '',
-          popular: serviceData.tier1.popular === true || serviceData.tier1.popular === 'true',
-        },
-        {
-          name: serviceData.tier2.name || '',
-          tagline: serviceData.tier2.tagline || '',
-          goal: serviceData.tier2.goal || '',
-          includes: (serviceData.tier2.includes || '').split('\n').filter((s: string) => s.trim()),
-          pricing: {
-            inIndia: serviceData.tier2.pricingInIndia || '',
-            international: serviceData.tier2.pricingInternational || '',
-          },
-          note: serviceData.tier2.note || '',
-          popular: serviceData.tier2.popular === true || serviceData.tier2.popular === 'true',
-        },
-        {
-          name: serviceData.tier3.name || '',
-          tagline: serviceData.tier3.tagline || '',
-          goal: serviceData.tier3.goal || '',
-          includes: (serviceData.tier3.includes || '').split('\n').filter((s: string) => s.trim()),
-          pricing: {
-            inIndia: serviceData.tier3.pricingInIndia || '',
-            international: serviceData.tier3.pricingInternational || '',
-          },
-          note: serviceData.tier3.note || '',
-          popular: serviceData.tier3.popular === true || serviceData.tier3.popular === 'true',
-        },
-      ],
+      tiers,
     };
   };
 
@@ -111,12 +111,24 @@ export const Pricing: React.FC = () => {
   const [selectedService, setSelectedService] = useState<string>('all');
   const cmsData = useCMSContent<PricingPageData>('pricing');
   
-  // Build pricing data from CMS, fallback to default if CMS data is incomplete
+  // Build pricing data from CMS, fallback to default
   const pricingDataFromCMS = buildPricingDataFromCMS(cmsData);
   const pricingDataFromDefault = buildPricingDataFromCMS(defaultPricingData);
   
-  // Use CMS data if first service has a title, otherwise use default
-  const pricingData = pricingDataFromCMS[0]?.title ? pricingDataFromCMS : pricingDataFromDefault;
+  // Simple validation based on first service having tiers
+  const hasCMSData = cmsData && 
+    cmsData.personalBranding && 
+    pricingDataFromCMS[0]?.tiers.length > 0;
+    
+  const pricingData = hasCMSData ? pricingDataFromCMS : pricingDataFromDefault;
+  
+  // Simplified debug logging
+  console.log('🎯 [PRICING] Data loaded:', {
+    hasCMSData,
+    servicesCount: pricingData.length,
+    firstService: pricingData[0]?.title,
+    firstTier: pricingData[0]?.tiers[0]?.name
+  });
 
   const filteredServices = selectedService === 'all' 
     ? pricingData 

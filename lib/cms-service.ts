@@ -3,22 +3,34 @@ import { supabase } from './supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 // Cache for CMS content to reduce database calls
-const contentCache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+// Reduced cache duration to ensure changes are reflected faster
+const contentCache = new Map<string, { data: any; timestamp: number; version: number }>();
+const CACHE_DURATION = 5 * 1000; // 5 seconds (aggressive caching for real-time feel)
+let globalCacheVersion = 0; // Global version to force cache invalidation
 
 /**
  * Get CMS content for a specific page from Supabase
  * Uses caching to improve performance
  */
-export async function getCMSContent<T>(pageId: string): Promise<T | null> {
+export async function getCMSContent<T>(pageId: string, forceRefresh: boolean = false): Promise<T | null> {
     try {
-        // Check cache first
-        const cached = contentCache.get(pageId);
-        if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-            return cached.data as T;
+        // Check cache first (unless force refresh)
+        if (!forceRefresh) {
+            const cached = contentCache.get(pageId);
+            if (cached && Date.now() - cached.timestamp < CACHE_DURATION && cached.version === globalCacheVersion) {
+                console.log(`📦 [CACHE HIT] Using cached data for: ${pageId}`);
+                return cached.data as T;
+            }
+
+            if (cached) {
+                console.log(`🔄 [CACHE EXPIRED] Fetching fresh data for: ${pageId}`);
+            }
+        } else {
+            console.log(`🔄 [FORCE REFRESH] Bypassing cache for: ${pageId}`);
         }
 
         // Fetch from Supabase
+        console.log(`🌐 [FETCH] Requesting data from Supabase for: ${pageId}`);
         const { data, error } = await supabase
             .from('cms_content')
             .select('content')
@@ -28,21 +40,27 @@ export async function getCMSContent<T>(pageId: string): Promise<T | null> {
         if (error) {
             if (error.code === 'PGRST116') {
                 // No data found - this is okay, will use default data
+                console.log(`⚠️ [NO DATA] No CMS content found for: ${pageId}`);
                 return null;
             }
-            console.error(`Error fetching CMS content for ${pageId}:`, error);
+            console.error(`❌ [ERROR] Error fetching CMS content for ${pageId}:`, error);
             return null;
         }
 
-        // Update cache
+        // Update cache with version
         if (data) {
-            contentCache.set(pageId, { data: data.content, timestamp: Date.now() });
+            contentCache.set(pageId, {
+                data: data.content,
+                timestamp: Date.now(),
+                version: globalCacheVersion
+            });
+            console.log(`💾 [CACHE SET] Cached data for: ${pageId}`);
             return data.content as T;
         }
 
         return null;
     } catch (error) {
-        console.error(`Exception fetching CMS content for ${pageId}:`, error);
+        console.error(`❌ [EXCEPTION] Exception fetching CMS content for ${pageId}:`, error);
         return null;
     }
 }
@@ -76,9 +94,10 @@ export async function saveCMSContent<T>(pageId: string, content: T): Promise<boo
             return false;
         }
 
-        // Invalidate cache
+        // Invalidate cache - both delete specific and bump global version
         contentCache.delete(pageId);
-        console.log('🔄 [DATABASE] Cache invalidated for', pageId);
+        globalCacheVersion++; // Bump global version to invalidate all caches
+        console.log('🔄 [DATABASE] Cache invalidated for', pageId, '(global version:', globalCacheVersion, ')');
 
         console.log('✅ [DATABASE] Update complete!', {
             pageId,
@@ -115,11 +134,17 @@ export function subscribeToCMSUpdates(
                     filter: `page_id=eq.${pageId}`,
                 },
                 (payload) => {
+                    console.log(`🔔 [REALTIME] Received update for: ${pageId}`);
+
                     // Invalidate cache
                     contentCache.delete(pageId);
+                    globalCacheVersion++; // Bump version
+
+                    console.log(`🗑️ [REALTIME] Cache cleared for: ${pageId}`);
 
                     // Call callback with new content
                     if (payload.new && 'content' in payload.new) {
+                        console.log(`✨ [REALTIME] Applying new content for: ${pageId}`);
                         callback((payload.new as any).content);
                     }
                 }
@@ -164,8 +189,11 @@ export async function getAllCMSPageIds(): Promise<string[]> {
 export function clearCache(pageId?: string): void {
     if (pageId) {
         contentCache.delete(pageId);
+        console.log(`🗑️ [MANUAL] Cache cleared for: ${pageId}`);
     } else {
         contentCache.clear();
+        globalCacheVersion++; // Bump version when clearing all
+        console.log(`🗑️ [MANUAL] All cache cleared (version: ${globalCacheVersion})`);
     }
 }
 

@@ -1,6 +1,7 @@
 // Supabase Storage Utilities - Replaces LocalStorage with Supabase
 import { getCMSContent as getSupabaseCMSContent, saveCMSContent as saveSupabaseCMSContent, subscribeToCMSUpdates as supabaseSubscribe } from '../../lib/cms-service';
 
+
 const CMS_DATA_PREFIX = 'cms_data_';
 const BROADCAST_CHANNEL_NAME = 'cms_updates';
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Users, Settings, DollarSign, Image, PenTool, Rocket, Activity, Database, Zap, LogOut, Lightbulb, Globe, BarChart3, Video } from 'lucide-react';
+import { FileText, Users, Settings, DollarSign, Image, PenTool, Rocket, Activity, Database, Zap, LogOut, Lightbulb, Globe, BarChart3, Video, Mail, Package } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -70,6 +70,14 @@ export const AdminDashboard: React.FC = () => {
       path: '/admin/editor/blog',
     },
     {
+      id: 'blog-seo-2025',
+      title: 'Blog: SEO 2025',
+      description: 'EDIT "THE DEATH OF TRADITIONAL SEO" BLOG POST.',
+      icon: PenTool,
+      color: 'orange',
+      path: '/admin/editor/blog-seo-2025',
+    },
+    {
       id: 'service-web-dev',
       title: 'Service: Web Development',
       description: 'EDIT WEB DEVELOPMENT SERVICE DETAIL PAGE.',
@@ -92,6 +100,22 @@ export const AdminDashboard: React.FC = () => {
       icon: Video,
       color: 'red',
       path: '/admin/editor/service-video',
+    },
+    {
+      id: 'newsletter',
+      title: 'Newsletter CTA (Global)',
+      description: 'EDIT NEWSLETTER SECTION THAT APPEARS ON ALL PAGES.',
+      icon: Mail,
+      color: 'yellow',
+      path: '/admin/editor/newsletter',
+    },
+    {
+      id: 'footer',
+      title: 'Footer (Global)',
+      description: 'EDIT FOOTER SECTION THAT APPEARS ON ALL PAGES.',
+      icon: Package,
+      color: 'cyan',
+      path: '/admin/editor/footer',
     },
   ];
 

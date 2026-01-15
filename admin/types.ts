@@ -27,6 +27,8 @@ export interface HomePageData {
         tagline: string;
         headline: string;
         description: string;
+        primaryButtonText: string;
+        secondaryButtonText: string;
         backgroundImage: string;
     };
     trustMetrics: {
@@ -36,6 +38,71 @@ export interface HomePageData {
         stat2Label: string;
         stat3Value: string;
         stat3Label: string;
+    };
+    servicesIntro: {
+        sectionTitle: string;
+        sectionSubtitle: string;
+        service1Heading: string;
+        service1Description: string;
+        service1Image: string;
+        service2Heading: string;
+        service2Description: string;
+        service2Image: string;
+        service3Heading: string;
+        service3Description: string;
+        service3Image: string;
+    };
+    whyImpact224: {
+        sectionTitle: string;
+        feature1Title: string;
+        feature1Icon: string;
+        feature2Title: string;
+        feature2Icon: string;
+        feature3Title: string;
+        feature3Icon: string;
+        feature4Title: string;
+        feature4Icon: string;
+    };
+    projectsShowcase: {
+        sectionTitle: string;
+        sectionSubtitle: string;
+        buttonText: string;
+        project1Title: string;
+        project1Stats: string;
+        project1Image: string;
+        project2Title: string;
+        project2Stats: string;
+        project2Image: string;
+        project3Title: string;
+        project3Stats: string;
+        project3Image: string;
+        project4Title: string;
+        project4Stats: string;
+        project4Image: string;
+    };
+    latestInsights: {
+        sectionTitle: string;
+        sectionSubtitle: string;
+        blog1Category: string;
+        blog1Image: string;
+        blog1Title: string;
+        blog1Date: string;
+        blog1ReadTime: string;
+        blog2Category: string;
+        blog2Image: string;
+        blog2Title: string;
+        blog2Date: string;
+        blog2ReadTime: string;
+        blog3Category: string;
+        blog3Image: string;
+        blog3Title: string;
+        blog3Date: string;
+        blog3ReadTime: string;
+        blog4Category: string;
+        blog4Image: string;
+        blog4Title: string;
+        blog4Date: string;
+        blog4ReadTime: string;
     };
 }
 
@@ -139,17 +206,86 @@ export interface PricingPageData {
 // Blog Page Data
 export interface BlogPageData {
     pageHeader: {
-        badge: string;
         mainHeading: string;
         subHeading: string;
-        newsletterHeading: string;
     };
-    post1: {
-        postTitle: string;
-        authorName: string;
-        publishDate: string;
+    blog1: {
+        category: string;
+        title: string;
+        excerpt: string;
+        author: string;
+        date: string;
+        readTime: string;
+        image: string;
+        slug: string;
+    };
+    blog2: {
+        category: string;
+        title: string;
+        excerpt: string;
+        author: string;
+        date: string;
+        readTime: string;
+        image: string;
+        slug: string;
+    };
+    blog3: {
+        category: string;
+        title: string;
+        excerpt: string;
+        author: string;
+        date: string;
+        readTime: string;
+        image: string;
+        slug: string;
+    };
+    blog4: {
+        category: string;
+        title: string;
+        excerpt: string;
+        author: string;
+        date: string;
+        readTime: string;
+        image: string;
+        slug: string;
+    };
+}
+
+// Blog Detail Page Data
+export interface BlogDetailData {
+    hero: {
+        tagline: string;
+        heading: string;
+        author: string;
+        date: string;
         readTime: string;
         featuredImage: string;
+    };
+    introduction: {
+        introParagraph: string;
+    };
+    section1: {
+        subheading: string;
+        content: string;
+    };
+    section2: {
+        subheading: string;
+        content: string;
+    };
+    dialogBox: {
+        quoteText: string;
+    };
+    section3: {
+        subheading: string;
+        bullet1: string;
+        bullet2: string;
+        bullet3: string;
+        closingParagraph: string;
+    };
+    cta: {
+        ctaHeading: string;
+        ctaSubheading: string;
+        buttonText: string;
     };
 }
 
@@ -229,6 +365,46 @@ export interface ServiceDetailData {
 }
 
 
+// Newsletter CTA Data (Global Component)
+export interface NewsletterPageData {
+    newsletterCTA: {
+        heading: string;
+        subheading: string;
+        button1Text: string;
+        button1Link: string;
+        button2Text: string;
+        button2Link: string;
+    };
+}
+
+
+// Footer Data (Global Component)
+export interface FooterPageData {
+    branding: {
+        brandName: string;
+        brandNumber: string;
+        description: string;
+    };
+    socialMedia: {
+        linkedinUrl: string;
+        instagramUrl: string;
+        youtubeUrl: string;
+    };
+    resources: {
+        sectionTitle: string;
+    };
+    contact: {
+        sectionTitle: string;
+        email: string;
+        phone: string;
+        location: string;
+    };
+    copyright: {
+        copyrightText: string;
+    };
+}
+
+
 // All CMS Data
 export interface CMSData {
     home: HomePageData;
@@ -240,6 +416,9 @@ export interface CMSData {
     serviceWebDev: ServiceDetailData;
     serviceMarketing: ServiceDetailData;
     serviceVideo: ServiceDetailData;
+    newsletter: NewsletterPageData;
+    footer: FooterPageData;
+    blogSeo2025: BlogDetailData;
 }
 
 // Auth Types

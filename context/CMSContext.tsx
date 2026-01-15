@@ -70,23 +70,27 @@ export const useCMSContent = <T,>(pageId: string): T => {
   useEffect(() => {
     let isMounted = true;
     let unsubscribe: (() => void) | null = null;
+    let pollInterval: NodeJS.Timeout | null = null;
 
     // Fetch content from Supabase
-    const fetchContent = async () => {
+    const fetchContent = async (forceRefresh: boolean = false) => {
       try {
-        const data = await getCMSContent<T>(pageId);
+        console.log(`🔍 [CMS HOOK] Fetching content for: ${pageId} (force: ${forceRefresh})`);
+        const data = await getCMSContent<T>(pageId, forceRefresh);
         
         if (isMounted) {
           if (data) {
+            console.log(`✅ [CMS HOOK] Content loaded for: ${pageId}`);
             setContent(data);
           } else {
             // Use default data if no content in database
+            console.log(`📄 [CMS HOOK] Using default data for: ${pageId}`);
             setContent(defaultData);
           }
           setIsLoading(false);
         }
       } catch (error) {
-        console.error(`Error fetching CMS content for ${pageId}:`, error);
+        console.error(`❌ [CMS HOOK] Error fetching CMS content for ${pageId}:`, error);
         if (isMounted) {
           // Fallback to default data on error
           setContent(defaultData);
@@ -96,17 +100,36 @@ export const useCMSContent = <T,>(pageId: string): T => {
     };
 
     // Initial fetch
-    fetchContent();
+    fetchContent(false);
+
+    // Add window focus listener to refetch when user switches back to tab
+    const handleFocus = () => {
+      console.log(`👁️ [FOCUS] Window focused, refreshing content for: ${pageId}`);
+      fetchContent(true); // Force refresh on focus
+    };
+    window.addEventListener('focus', handleFocus);
+
+    // Add periodic polling as fallback (every 10 seconds)
+    // This ensures updates are picked up even if real-time subscriptions fail
+    pollInterval = setInterval(() => {
+      console.log(`⏰ [POLL] Periodic check for: ${pageId}`);
+      fetchContent(false); // Use cache if still valid
+    }, 10000);
 
     // Subscribe to real-time updates
+    console.log(`🔔 [REALTIME] Setting up subscription for: ${pageId}`);
     unsubscribe = subscribeToCMSUpdates(pageId, (updatedContent) => {
       if (isMounted) {
+        console.log(`✨ [REALTIME] Real-time update received for: ${pageId}`);
         setContent(updatedContent as T);
       }
     });
 
     return () => {
+      console.log(`🧹 [CLEANUP] Cleaning up subscriptions for: ${pageId}`);
       isMounted = false;
+      window.removeEventListener('focus', handleFocus);
+      if (pollInterval) clearInterval(pollInterval);
       if (unsubscribe) {
         unsubscribe();
       }
