@@ -10,7 +10,8 @@ export const homeSchema: CMSPageSchema = {
             icon: 'document',
             fields: [
                 { name: 'tagline', type: 'text', label: 'Tagline', placeholder: 'DIGITAL GROWTH AGENCY' },
-                { name: 'headline', type: 'text', label: 'Headline', placeholder: 'STOP LOSING LEADS ONLINE.' },
+                { name: 'headlineLine1', type: 'text', label: 'Headline - Line 1', placeholder: 'Stop Chasing Leads' },
+                { name: 'headlineLine2', type: 'text', label: 'Headline - Line 2', placeholder: 'Online' },
                 { name: 'description', type: 'text', label: 'Description' },
                 { name: 'primaryButtonText', type: 'text', label: 'Primary Button Text', placeholder: 'Audit My Presence' },
                 { name: 'secondaryButtonText', type: 'text', label: 'Secondary Button Text', placeholder: 'See Results' },
@@ -138,7 +139,8 @@ export const homeSchema: CMSPageSchema = {
 export const defaultHomeData: HomePageData = {
     hero: {
         tagline: 'DIGITAL GROWTH AGENCY',
-        headline: 'STOP LOSING LEADS ONLINE.',
+        headlineLine1: 'Stop Chasing Leads',
+        headlineLine2: 'Online',
         description: 'WE BUILD HIGH-PERFORMANCE WEBSITES AND AUTOMATED MARKETING SYSTEMS.',
         primaryButtonText: 'Audit My Presence',
         secondaryButtonText: 'See Results',

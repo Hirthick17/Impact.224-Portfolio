@@ -23,28 +23,28 @@ export const About: React.FC = () => {
                  />
                  
                  <div className="grid grid-cols-3 gap-6 pt-6 border-t border-neutral-200 dark:border-neutral-800">
-                    <div>
-                        <span className={`block text-4xl font-bold mb-1 ${getAccentColorClass('text')}`}>
-                          {cmsData.performance?.stat1Value || "80%"}
+                    <div className="text-center">
+                        <span className={`block text-6xl font-extrabold mb-2 ${getAccentColorClass('text')} drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]`}>
+                          2
                         </span>
-                        <span className="text-xs uppercase tracking-wide text-neutral-500 font-bold">
-                          {cmsData.performance?.stat1Label || "Faster Load Times"}
-                        </span>
-                    </div>
-                    <div>
-                        <span className={`block text-4xl font-bold mb-1 ${getAccentColorClass('text')}`}>
-                          {cmsData.performance?.stat2Value || "No. 1"}
-                        </span>
-                        <span className="text-xs uppercase tracking-wide text-neutral-500 font-bold">
-                          {cmsData.performance?.stat2Label || "In ROI Focused Design"}
+                        <span className={`text-sm uppercase tracking-wide ${getAccentColorClass('text')} opacity-70 font-semibold`}>
+                          Today
                         </span>
                     </div>
-                    <div>
-                        <span className={`block text-4xl font-bold mb-1 ${getAccentColorClass('text')}`}>
-                          {cmsData.performance?.stat3Value || "100%"}
+                    <div className="text-center">
+                        <span className={`block text-6xl font-extrabold mb-2 ${getAccentColorClass('text')} drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]`}>
+                          2
                         </span>
-                        <span className="text-xs uppercase tracking-wide text-neutral-500 font-bold">
-                          {cmsData.performance?.stat3Label || "Client Satisfaction"}
+                        <span className={`text-sm uppercase tracking-wide ${getAccentColorClass('text')} opacity-70 font-semibold`}>
+                          Tomorrow
+                        </span>
+                    </div>
+                    <div className="text-center">
+                        <span className={`block text-6xl font-extrabold mb-2 ${getAccentColorClass('text')} drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]`}>
+                          4
+                        </span>
+                        <span className={`text-sm uppercase tracking-wide ${getAccentColorClass('text')} opacity-70 font-semibold`}>
+                          Forever
                         </span>
                     </div>
                  </div>

@@ -210,7 +210,7 @@ export const Pricing: React.FC = () => {
               {service.tiers.map((tier, tierIdx) => (
                 <ScrollReveal key={tier.name} delay={tierIdx * 100}>
                   <div
-                    className={`relative rounded-2xl p-8 transition-all hover:scale-[1.02] h-full ${
+                    className={`relative rounded-2xl p-8 transition-all hover:scale-[1.02] h-full flex flex-col ${
                       tier.popular
                         ? `bg-gradient-to-b from-${getAccentColorClass('bg').replace('bg-', '')}/10 to-white dark:to-black border-2 ${getAccentColorClass('border')}`
                         : 'bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800'
@@ -237,7 +237,7 @@ export const Pricing: React.FC = () => {
                       </p>
                     </div>
 
-                    <div className="mb-6">
+                    <div className="mb-6 flex-grow">
                       <p className="text-xs font-bold uppercase tracking-wider mb-4 text-neutral-500">
                         Includes:
                       </p>
@@ -260,13 +260,13 @@ export const Pricing: React.FC = () => {
                       {tier.pricing.inIndia && (
                         <>
                           <p className="text-xs font-semibold uppercase text-neutral-500 mb-1">In India</p>
-                          <p className="text-2xl font-bold mb-3 text-neutral-900 dark:text-white">{tier.pricing.inIndia}</p>
+                          <p className="text-2xl font-bold mb-4 text-neutral-900 dark:text-white">{tier.pricing.inIndia}</p>
                         </>
                       )}
                       {tier.pricing.international && (
                         <>
                           <p className="text-xs font-semibold uppercase text-neutral-500 mb-1">International</p>
-                          <p className="text-xl font-semibold text-neutral-700 dark:text-neutral-400">{tier.pricing.international}</p>
+                          <p className="text-2xl font-bold text-neutral-900 dark:text-white">{tier.pricing.international}</p>
                         </>
                       )}
                     </div>
@@ -279,13 +279,15 @@ export const Pricing: React.FC = () => {
                       </div>
                     )}
 
-                    <NavLink to="/contact">
-                      <Button 
-                        className="w-full rounded-xl font-bold uppercase tracking-wider"
-                      >
-                        SELECT PLAN
-                      </Button>
-                    </NavLink>
+                    <div className="mt-auto">
+                      <NavLink to="/contact">
+                        <Button 
+                            className="w-full rounded-xl font-bold uppercase tracking-wider"
+                        >
+                          SELECT PLAN
+                        </Button>
+                      </NavLink>
+                    </div>
                   </div>
                 </ScrollReveal>
               ))}

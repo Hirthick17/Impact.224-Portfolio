@@ -50,7 +50,11 @@ export const Home: React.FC = () => {
             <Badge text={cmsData.hero?.tagline || "Digital Growth Agency"} />
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-white">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-neutral-400">
-                {cmsData.hero?.headline || "Stop Losing Leads Online."}
+                {cmsData.hero?.headlineLine1 || "Stop Chasing Leads"}
+              </span>
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-neutral-400">
+                {cmsData.hero?.headlineLine2 || "Online"}
               </span>
             </h1>
             <p className="text-lg md:text-xl text-neutral-400 max-w-2xl leading-relaxed">

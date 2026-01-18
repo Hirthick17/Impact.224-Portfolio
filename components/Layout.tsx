@@ -2,10 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { Button } from './UIComponents';
-import { Lightbulb, Menu, X, Moon, Sun, Palette, Mail, Linkedin, Instagram, ChevronDown, Lock } from 'lucide-react';
-import { servicesData } from '../data';
+import { Lightbulb, Menu, X, Moon, Sun, Palette, Mail, Linkedin, Instagram, ChevronDown, Lock, Globe, Video, Target } from 'lucide-react';
 import { useCMSContent } from '../context/CMSContext';
-import { NewsletterPageData, FooterPageData} from '../admin/types';
+import { NewsletterPageData, FooterPageData, ServicesPageData } from '../admin/types';
 
 const links = [
   { name: 'Home', path: '/' },
@@ -26,6 +25,26 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
   const location = useLocation();
   const newsletterData = useCMSContent<NewsletterPageData>('newsletter');
   const footerData = useCMSContent<FooterPageData>('footer');
+  const servicesData = useCMSContent<ServicesPageData>('services');
+
+  // Create services array from CMS data
+  const servicesArray = [
+    {
+      id: 'personal-branding',
+      title: servicesData?.personalBranding?.displayTitle || 'PERSONAL BRANDING',
+      icon: Target,
+    },
+    {
+      id: 'video-editing',
+      title: servicesData?.videoEditing?.displayTitle || 'VIDEO EDITING',
+      icon: Video,
+    },
+    {
+      id: 'website-development',
+      title: servicesData?.websiteDevelopment?.displayTitle || 'WEBSITE DEVELOPMENT',
+      icon: Globe,
+    }
+  ];
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -129,7 +148,7 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
                         View All Services
                       </NavLink>
                       <div className="border-t border-neutral-800 my-2"></div>
-                      {servicesData.map(service => (
+                      {servicesArray.map(service => (
                         <NavLink 
                           key={service.id} 
                           to={`/services/${service.id}`}
@@ -190,32 +209,6 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
       <main className="flex-grow pt-28">
         {children}
       </main>
-
-      {/* --- Sticky CTA Section (Pre-Footer) --- */}
-      <section className="py-16 px-6 bg-neutral-50 dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
-          <div className="max-w-xl">
-            <h3 className="text-3xl font-bold mb-2 text-neutral-900 dark:text-white">
-              {newsletterData?.newsletterCTA?.heading || "Subscribe to our newsletter"}
-            </h3>
-            <p className="text-neutral-500">
-              {newsletterData?.newsletterCTA?.subheading || "Stay updated with our latest insights and exclusive content."}
-            </p>
-          </div>
-          <div className="flex gap-4">
-             <NavLink to={newsletterData?.newsletterCTA?.button1Link || "/projects"}>
-               <Button variant="outline">
-                 {newsletterData?.newsletterCTA?.button1Text || "Case Studies"}
-               </Button>
-             </NavLink>
-             <NavLink to={newsletterData?.newsletterCTA?.button2Link || "/contact"}>
-                <Button>
-                  {newsletterData?.newsletterCTA?.button2Text || "Scale Your Business"}
-                </Button>
-             </NavLink>
-          </div>
-        </div>
-      </section>
 
       {/* --- Footer --- */}
       <footer className="bg-neutral-950 dark:bg-black py-12 px-6 text-white border-t border-neutral-800">
@@ -292,6 +285,32 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
           <p className="text-neutral-400 text-sm">{footerData?.copyright?.copyrightText || "© 2025 Impact.224. All rights reserved."}</p>
         </div>
       </footer>
+
+      {/* --- Newsletter CTA Section --- */}
+      <section className="py-16 px-6 bg-neutral-50 dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+          <div className="max-w-xl">
+            <h3 className="text-3xl font-bold mb-2 text-neutral-900 dark:text-white">
+              {newsletterData?.newsletterCTA?.heading || "Subscribe to our newsletter"}
+            </h3>
+            <p className="text-neutral-500">
+              {newsletterData?.newsletterCTA?.subheading || "Stay updated with our latest insights and exclusive content."}
+            </p>
+          </div>
+          <div className="flex gap-4">
+             <NavLink to={newsletterData?.newsletterCTA?.button1Link || "/projects"}>
+               <Button variant="outline">
+                 {newsletterData?.newsletterCTA?.button1Text || "Case Studies"}
+               </Button>
+             </NavLink>
+             <NavLink to={newsletterData?.newsletterCTA?.button2Link || "/contact"}>
+                <Button>
+                  {newsletterData?.newsletterCTA?.button2Text || "Scale Your Business"}
+                </Button>
+             </NavLink>
+          </div>
+        </div>
+      </section>
 
       {/* --- Design Experimentation Panel (Floating) --- */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">

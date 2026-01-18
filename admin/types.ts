@@ -25,7 +25,8 @@ export interface CMSPageSchema {
 export interface HomePageData {
     hero: {
         tagline: string;
-        headline: string;
+        headlineLine1: string;
+        headlineLine2: string;
         description: string;
         primaryButtonText: string;
         secondaryButtonText: string;
@@ -295,6 +296,25 @@ export interface ProjectsPageData {
         pageTitle: string;
         pageSubtitle: string;
     };
+    projectInsights: {
+        sectionTitle: string;
+        insight1Number: string;
+        insight1Heading: string;
+        insight1Subtitle: string;
+        insight2Number: string;
+        insight2Heading: string;
+        insight2Subtitle: string;
+        insight3Number: string;
+        insight3Heading: string;
+        insight3Subtitle: string;
+        insight4Number: string;
+        insight4Heading: string;
+        insight4Subtitle: string;
+    };
+    clientReviews: {
+        sectionTitle: string;
+        sectionSubtitle: string;
+    };
     project1: {
         projectTitle: string;
         headlineResultStat: string;
@@ -304,6 +324,11 @@ export interface ProjectsPageData {
         theChallenge: string;
         theSolution: string;
         results: string;
+        testimonialText: string;
+        testimonialAuthor: string;
+        testimonialRole: string;
+        testimonialRating: string;
+        testimonialImage: string;
     };
     project2: {
         projectTitle: string;
@@ -314,6 +339,11 @@ export interface ProjectsPageData {
         theChallenge: string;
         theSolution: string;
         results: string;
+        testimonialText: string;
+        testimonialAuthor: string;
+        testimonialRole: string;
+        testimonialRating: string;
+        testimonialImage: string;
     };
     project3: {
         projectTitle: string;
@@ -324,6 +354,11 @@ export interface ProjectsPageData {
         theChallenge: string;
         theSolution: string;
         results: string;
+        testimonialText: string;
+        testimonialAuthor: string;
+        testimonialRole: string;
+        testimonialRating: string;
+        testimonialImage: string;
     };
 }
 
